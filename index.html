@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Invitados · 70 años de Don Anundo</title>
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:wght@400;600;700;800&family=Rye&display=swap" rel="stylesheet">
+<!-- Visor de invitados para la familia (página aparte, en su propio GitHub Pages).
+     Enlace: https://…/#clave=XXXX   (la clave va en el # para que no viaje en el Referer)
+     Vista previa con datos de ejemplo: https://…/#demo
+     Los datos salen de la app de Apps Script: URL_EXEC + ?api=visor&clave=… (JSON; JSONP de respaldo).
+     publicar.cmd cambia https://script.google.com/macros/s/AKfycbxxGH_OAizEu_toynNUrgAmxQCTVUbU-VCLVur75xKttOFSJUCjXpdNiFfJPM5M18YQnA/exec por la URL /exec real. -->
+<style>
+  :root {
+    --rojo: #B3261E; --rojo-vivo: #D7301F; --rojo-oscuro: #7A1712;
+    --terracota: #C2633A; --terracota-claro: #DD8B5E;
+    --madera: #6B3E22; --madera-clara: #9A6136; --madera-oscura: #3B2213; --carbon: #1E1410;
+    --kraft: #E7D1AE; --kraft-oscuro: #CDAF83; --crema: #F8EEDC;
+    --tinta: #2B1A12; --tinta-suave: #5C4334;
+    --oro: #D9A93B; --oro-claro: #F3D47C; --oro-oscuro: #9C7420;
+    --fuente-cartel: 'Rye', Georgia, serif;
+    --fuente-texto: 'Bitter', Georgia, serif;
+    --fuente-tablero: 'Bebas Neue', Impact, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow-x: hidden; }
+  body {
+    min-height: 100vh;
+    color: var(--crema);
+    font: 16px/1.45 var(--fuente-texto);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(243, 212, 124, .16), transparent 60%),
+      radial-gradient(ellipse at 50% 120%, rgba(0, 0, 0, .55), transparent 60%),
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, .10) 0 2px, transparent 2px 46px),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, .025) 0 1px, transparent 1px 7px),
+      linear-gradient(180deg, var(--madera) 0%, var(--madera-oscura) 55%, var(--carbon) 100%);
+    background-attachment: fixed;
+  }
+  .contenedor { max-width: 1100px; margin: 0 auto; padding: 0 16px 32px; }
+
+  /* Guirnalda de bombillos y papel picado */
+  .guirnalda { position: relative; height: 44px; overflow: hidden; }
+  .guirnalda svg { position: absolute; inset: 0; width: 100%; height: 44px; }
+  .bombillo { animation: titila 2.6s ease-in-out infinite; }
+  .bombillo:nth-child(3n) { animation-delay: .8s; }
+  .bombillo:nth-child(3n+1) { animation-delay: 1.6s; }
+  @keyframes titila { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+  .picado { height: 26px; opacity: .5; margin-top: -6px;
+    background: repeating-linear-gradient(90deg, var(--rojo) 0 38px, var(--terracota) 38px 76px, var(--oro) 76px 114px);
+    clip-path: polygon(0 0, 100% 0, 100% 60%, 97.5% 100%, 95% 60%, 92.5% 100%, 90% 60%, 87.5% 100%, 85% 60%, 82.5% 100%, 80% 60%, 77.5% 100%, 75% 60%, 72.5% 100%, 70% 60%, 67.5% 100%, 65% 60%, 62.5% 100%, 60% 60%, 57.5% 100%, 55% 60%, 52.5% 100%, 50% 60%, 47.5% 100%, 45% 60%, 42.5% 100%, 40% 60%, 37.5% 100%, 35% 60%, 32.5% 100%, 30% 60%, 27.5% 100%, 25% 60%, 22.5% 100%, 20% 60%, 17.5% 100%, 15% 60%, 12.5% 100%, 10% 60%, 7.5% 100%, 5% 60%, 2.5% 100%, 0 60%); }
+
+  /* Encabezado */
+  header { text-align: center; padding: 10px 0 6px; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--oro-claro); font: 15px var(--fuente-cartel); letter-spacing: .06em; }
+  .logo b { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--oro-claro), var(--oro) 55%, var(--oro-oscuro));
+    color: var(--rojo-oscuro); font: 19px var(--fuente-cartel); box-shadow: 0 0 0 3px var(--madera-oscura), 0 0 0 5px var(--oro), 0 4px 10px rgba(0,0,0,.5); }
+  h1 { margin: 10px 0 2px; font: clamp(25px, 6.5vw, 44px)/1.1 var(--fuente-cartel); color: var(--crema);
+    text-shadow: 0 2px 0 var(--rojo-oscuro), 0 4px 12px rgba(0,0,0,.6); }
+  h1 span { color: var(--oro-claro); }
+  .sub { margin: 0; color: var(--kraft); font-size: 16px; }
+
+  /* Tarjetas de cifras */
+  .cifras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+  @media (min-width: 760px) { .cifras { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+  .cifra { position: relative; padding: 12px 10px 10px; border-radius: 10px; text-align: center;
+    background: linear-gradient(180deg, var(--crema), var(--kraft)); color: var(--tinta);
+    box-shadow: 0 0 0 3px var(--madera-clara), 0 0 0 5px var(--madera-oscura), 0 6px 14px rgba(0,0,0,.45); }
+  .cifra::before, .cifra::after { content: ''; position: absolute; top: 7px; width: 7px; height: 7px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #d9cfc2, #6b5a4a); }
+  .cifra::before { left: 7px; } .cifra::after { right: 7px; }
+  .cifra b { display: block; font: clamp(40px, 11vw, 58px)/1 var(--fuente-tablero); color: var(--rojo); }
+  .cifra span { display: block; font-size: 15px; font-weight: 700; color: var(--tinta-suave); }
+  .cifra.grande { grid-column: span 2; background: linear-gradient(180deg, var(--rojo-vivo), var(--rojo-oscuro)); color: var(--crema); }
+  .cifra.grande b { color: var(--oro-claro); font-size: clamp(56px, 16vw, 78px); }
+  .cifra.grande span { color: var(--crema); font-size: 17px; }
+  .cifra.dias { grid-column: span 2; }
+  @media (min-width: 760px) { .cifra.dias { grid-column: span 1; } }
+
+  /* Paneles */
+  .paneles { display: grid; gap: 16px; }
+  @media (min-width: 900px) { .paneles { grid-template-columns: 1.4fr 1fr; align-items: start; } }
+  .panel { background: linear-gradient(180deg, var(--crema), var(--kraft)); color: var(--tinta); border-radius: 10px; padding: 14px 14px 16px;
+    box-shadow: 0 0 0 3px var(--madera-clara), 0 0 0 5px var(--madera-oscura), 0 8px 18px rgba(0,0,0,.45); min-width: 0; }
+  .panel h2 { margin: 0 0 10px; font: 20px var(--fuente-cartel); color: var(--rojo-oscuro); }
+  .columna { display: grid; gap: 16px; min-width: 0; }
+
+  /* Barra adultos / niños */
+  .barra { display: flex; height: 30px; border-radius: 15px; overflow: hidden; background: var(--kraft-oscuro); box-shadow: inset 0 2px 4px rgba(0,0,0,.25); }
+  .barra i { display: block; height: 100%; transition: width .6s ease; }
+  .barra .adultos { background: var(--rojo); }
+  .barra .ninos { background: var(--oro); }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; font-size: 16px; }
+  .leyenda span::before { content: ''; display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 6px; vertical-align: -2px; }
+  .leyenda .a::before { background: var(--rojo); } .leyenda .n::before { background: var(--oro); }
+
+  /* Buscador y listas */
+  .buscar { width: 100%; padding: 12px 14px; font: 17px var(--fuente-texto); color: var(--tinta);
+    border: 2px solid var(--madera-clara); border-radius: 8px; background: #fffaf0; margin-bottom: 10px; }
+  .buscar:focus { outline: 3px solid var(--oro); outline-offset: 1px; }
+  .lista { list-style: none; margin: 0; padding: 0; }
+  .lista li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 10px 2px; border-bottom: 1px dashed var(--kraft-oscuro); }
+  .lista li:last-child { border-bottom: 0; }
+  .lista .nombre { font-weight: 700; font-size: 17px; overflow-wrap: anywhere; }
+  .lista .grupo { font: 22px/1 var(--fuente-tablero); color: var(--rojo); text-align: right; align-self: center; white-space: nowrap; }
+  .lista .detalle { grid-column: 1 / -1; font-size: 15px; color: var(--tinta-suave); }
+  .vacio { margin: 6px 0; color: var(--tinta-suave); font-size: 16px; }
+  .cuantos { display: block; font-size: 15px; color: var(--tinta-suave); margin: -4px 0 8px; }
+  .nombres { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .nombres li { background: #fffaf0; border: 1px solid var(--kraft-oscuro); border-radius: 16px; padding: 4px 12px; font-size: 16px; overflow-wrap: anywhere; }
+
+  /* Top 5 */
+  .top li { grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; }
+  .top .puesto { font: 30px/1 var(--fuente-tablero); color: var(--oro-oscuro); text-align: center; }
+  .top li:first-child .puesto { color: var(--oro); text-shadow: 0 1px 0 var(--oro-oscuro); }
+  .top .gallo { display: block; font-size: 15px; color: var(--tinta-suave); }
+  .top .marcador { font: 20px/1.1 var(--fuente-tablero); color: var(--rojo); text-align: right; white-space: nowrap; }
+
+  /* Pie, avisos */
+  .pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin: 22px 0 6px; color: var(--kraft); font-size: 16px; text-align: center; }
+  .boton { min-height: 48px; padding: 10px 22px; font: 19px var(--fuente-cartel); color: var(--rojo-oscuro); cursor: pointer;
+    border: 0; border-radius: 26px; background: linear-gradient(180deg, var(--oro-claro), var(--oro)); box-shadow: 0 3px 0 var(--oro-oscuro), 0 6px 12px rgba(0,0,0,.4); }
+  .boton:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--oro-oscuro); }
+  .boton:focus-visible { outline: 3px solid var(--crema); outline-offset: 3px; }
+  .boton[disabled] { opacity: .6; cursor: progress; }
+  .aviso { margin: 14px 0 0; padding: 10px 14px; border-radius: 8px; background: rgba(122, 23, 18, .85); color: var(--crema); font-size: 16px; text-align: center; }
+  .ejemplo { margin: 10px auto 0; max-width: 560px; padding: 6px 12px; border-radius: 8px; background: rgba(217, 169, 59, .2); color: var(--oro-claro); font-size: 15px; text-align: center; }
+  .cerrado { max-width: 520px; margin: 26px auto; padding: 22px 18px; text-align: center; font-size: 18px; }
+  .cerrado h2 { font-size: 22px; }
+  [hidden] { display: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bombillo { animation: none; }
+    .barra i { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="guirnalda" aria-hidden="true">
+    <svg viewBox="0 0 400 44" preserveAspectRatio="none">
+      <path d="M0 6 Q 50 30 100 6 T 200 6 T 300 6 T 400 6" fill="none" stroke="#2b1a12" stroke-width="1.5"/>
+    </svg>
+    <svg id="bombillos" viewBox="0 0 400 44" preserveAspectRatio="xMidYMin meet"></svg>
+  </div>
+  <div class="picado" aria-hidden="true"></div>
+
+  <div class="contenedor">
+    <header>
+      <div class="logo"><b>AA</b>Gallera AA</div>
+      <h1>Invitados · <span>70 años</span> de Don Anundo</h1>
+      <p class="sub" id="fecha">Cuántos van, para tener la cuenta en casa</p>
+      <p class="ejemplo" id="ejemplo" hidden>Vista previa con datos de ejemplo</p>
+    </header>
+
+    <section class="panel cerrado" id="sin-clave" hidden>
+      <h2>Este enlace está incompleto</h2>
+      <p>Pide el enlace completo a la familia.</p>
+    </section>
+
+    <div id="tablero" hidden>
+      <p class="aviso" id="aviso" role="alert" hidden></p>
+
+      <section class="cifras" aria-label="Cifras de la fiesta">
+        <div class="cifra grande"><b id="c-personas">—</b><span>Personas que van</span></div>
+        <div class="cifra"><b id="c-adultos">—</b><span>Adultos</span></div>
+        <div class="cifra"><b id="c-ninos">—</b><span>Niños</span></div>
+        <div class="cifra"><b id="c-confirmaciones">—</b><span>Confirmaciones</span></div>
+        <div class="cifra"><b id="c-no">—</b><span>No van</span></div>
+        <div class="cifra dias"><b id="c-dias">—</b><span id="c-dias-txt">Días para la fiesta</span></div>
+      </section>
+
+      <div class="paneles">
+        <section class="panel" aria-labelledby="t-van">
+          <h2 id="t-van">Los que van</h2>
+          <div class="barra" role="img" id="barra" aria-label="Adultos y niños"><i class="adultos" id="b-adultos" style="width:0"></i><i class="ninos" id="b-ninos" style="width:0"></i></div>
+          <div class="leyenda"><span class="a" id="l-adultos">Adultos</span><span class="n" id="l-ninos">Niños</span></div>
+          <h2 style="margin-top:16px">Confirmados</h2>
+          <label for="buscar" class="cuantos">Busca por nombre</label>
+          <input id="buscar" class="buscar" type="search" placeholder="Escribe un nombre…" autocomplete="off">
+          <p class="cuantos" id="cuantos"></p>
+          <ul class="lista" id="lista"></ul>
+        </section>
+
+        <div class="columna">
+          <section class="panel" aria-labelledby="t-top">
+            <h2 id="t-top">Gallera: los 5 mejores</h2>
+            <ul class="lista top" id="top"></ul>
+          </section>
+          <section class="panel" aria-labelledby="t-no">
+            <h2 id="t-no">No pueden ir</h2>
+            <ul class="nombres" id="no"></ul>
+          </section>
+        </div>
+      </div>
+
+      <div class="pie">
+        <button class="boton" id="actualizar" type="button">Actualizar</button>
+        <span id="hora" aria-live="polite">Cargando…</span>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+  // URL de la app de Apps Script (termina en /exec). publicar.cmd la escribe aquí.
+  var URL_EXEC = 'https://script.google.com/macros/s/AKfycbxxGH_OAizEu_toynNUrgAmxQCTVUbU-VCLVur75xKttOFSJUCjXpdNiFfJPM5M18YQnA/exec';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var datos = null;
+  var cargando = false;
+  var TILDES = new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36F) + ']', 'g');
+
+  // #clave=XXXX (o #demo para la vista previa con datos de ejemplo)
+  function leerHash() {
+    var h = String(location.hash || '').replace(/^#/, '');
+    if (h === 'demo') return { demo: true, clave: '' };
+    var m = h.match(/(?:^|&)clave=([^&]+)/);
+    return { demo: false, clave: m ? decodeURIComponent(m[1]).trim() : '' };
+  }
+  var modo = leerHash();
+
+  // Guirnalda: bombillos colgando de la cuerda
+  (function () {
+    var svg = $('bombillos'), html = '';
+    var colores = ['#F3D47C', '#D7301F', '#F3D47C', '#DD8B5E'];
+    for (var i = 0; i < 16; i++) {
+      var x = 12 + i * 25, y = 6 + 12 * Math.abs(Math.sin((x / 100) * Math.PI));
+      html += '<g class="bombillo"><line x1="' + x + '" y1="' + (y - 4) + '" x2="' + x + '" y2="' + y + '" stroke="#2b1a12" stroke-width="1.5"/>' +
+        '<circle cx="' + x + '" cy="' + (y + 6) + '" r="6" fill="' + colores[i % 4] + '"/>' +
+        '<circle cx="' + x + '" cy="' + (y + 6) + '" r="11" fill="' + colores[i % 4] + '" opacity=".25"/></g>';
+    }
+    svg.innerHTML = html;
+  })();
+
+  function esc(t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function plural(n, uno, varios) { return n + ' ' + (n === 1 ? uno : varios); }
+  function sinTildes(t) { var s = String(t || ''); try { s = s.normalize('NFD'); } catch (e) {} return s.replace(TILDES, '').toLowerCase(); }
+  function fechaCorta(iso) {
+    var d = new Date(iso);
+    if (!iso || isNaN(d)) return '';
+    try {
+      return 'Confirmó el ' + d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', timeZone: 'America/Bogota' }) +
+        ' a las ' + d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' });
+    } catch (e) { return ''; }
+  }
+
+  function pintar() {
+    var t = datos.totales;
+    $('c-personas').textContent = t.personas;
+    $('c-adultos').textContent = t.adultos;
+    $('c-ninos').textContent = t.ninos;
+    $('c-confirmaciones').textContent = t.confirmaciones;
+    $('c-no').textContent = t.noAsisten;
+    if (datos.diasFaltan == null) { $('c-dias').textContent = '—'; }
+    else if (datos.diasFaltan > 0) { $('c-dias').textContent = datos.diasFaltan; $('c-dias-txt').textContent = datos.diasFaltan === 1 ? 'Falta 1 día' : 'Días para la fiesta'; }
+    else if (datos.diasFaltan === 0) { $('c-dias').textContent = '¡Hoy!'; $('c-dias-txt').textContent = 'Es la fiesta'; }
+    else { $('c-dias').textContent = '✔'; $('c-dias-txt').textContent = 'Ya fue la fiesta'; }
+    if (datos.fechaTexto) $('fecha').textContent = datos.fechaTexto + ' · Finca Villa Carola';
+
+    var total = t.adultos + t.ninos;
+    $('b-adultos').style.width = (total ? (100 * t.adultos / total) : 0) + '%';
+    $('b-ninos').style.width = (total ? (100 * t.ninos / total) : 0) + '%';
+    $('l-adultos').textContent = plural(t.adultos, 'adulto', 'adultos');
+    $('l-ninos').textContent = plural(t.ninos, 'niño', 'niños');
+    $('barra').setAttribute('aria-label', plural(t.adultos, 'adulto', 'adultos') + ' y ' + plural(t.ninos, 'niño', 'niños'));
+
+    pintarLista();
+
+    $('top').innerHTML = datos.ranking.length ? datos.ranking.map(function (r) {
+      return '<li><span class="puesto">' + r.puesto + '</span><span><b>' + esc(r.nombre) + '</b><span class="gallo">' + esc(r.nombreGallo) + '</span></span>' +
+        '<span class="marcador">' + plural(r.ganadas, 'ganada', 'ganadas') + '<br>' + r.puntos + ' pts</span></li>';
+    }).join('') : '<li class="vacio">Todavía nadie ha peleado.</li>';
+
+    $('no').innerHTML = datos.noAsisten.length
+      ? datos.noAsisten.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('')
+      : '<li class="vacio" style="border:0;background:none;padding:0">Nadie ha dicho que no.</li>';
+
+    var d = new Date(datos.actualizado);
+    $('hora').textContent = 'Actualizado a las ' + (isNaN(d) ? '—' : d.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' })) + ' · se actualiza solo cada minuto';
+  }
+
+  function pintarLista() {
+    var q = sinTildes($('buscar').value.trim());
+    var lista = datos.asisten.filter(function (a) { return !q || sinTildes(a.nombre).indexOf(q) !== -1; });
+    $('cuantos').textContent = q ? plural(lista.length, 'resultado', 'resultados') : plural(datos.asisten.length, 'confirmación', 'confirmaciones') + ' que van (las más recientes primero)';
+    $('lista').innerHTML = lista.length ? lista.map(function (a) {
+      var partes = [plural(a.adultos, 'adulto', 'adultos')];
+      if (a.ninos) partes.push(plural(a.ninos, 'niño', 'niños'));
+      return '<li><span class="nombre">' + esc(a.nombre) + '</span><span class="grupo">' + (a.adultos + a.ninos) + '</span>' +
+        '<span class="detalle">' + partes.join(' · ') + (a.fecha ? ' — ' + esc(fechaCorta(a.fecha)) : '') + '</span></li>';
+    }).join('') : '<li class="vacio">' + (q ? 'Nadie con ese nombre.' : 'Todavía no hay confirmaciones.') + '</li>';
+  }
+
+  function aviso(texto) { $('aviso').textContent = texto; $('aviso').hidden = !texto; }
+  function sinClave() { $('tablero').hidden = true; $('sin-clave').hidden = false; }
+
+  /* Pide los datos con fetch (la /exec responde con CORS abierto); si falla, por JSONP. */
+  function pedir(clave) {
+    var url = URL_EXEC + '?api=visor&clave=' + encodeURIComponent(clave);
+    if (typeof fetch === 'function') {
+      return fetch(url, { credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer' })
+        .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+        .catch(function () { return jsonp(url); });
+    }
+    return jsonp(url);
+  }
+  function jsonp(url) {
+    return new Promise(function (resolver, rechazar) {
+      var nombre = '__visor' + Date.now();
+      var s = document.createElement('script');
+      var reloj = setTimeout(function () { limpiar(); rechazar(new Error('tiempo')); }, 20000);
+      function limpiar() { clearTimeout(reloj); try { delete window[nombre]; } catch (e) { window[nombre] = undefined; } if (s.parentNode) s.parentNode.removeChild(s); }
+      window[nombre] = function (r) { limpiar(); resolver(r); };
+      s.onerror = function () { limpiar(); rechazar(new Error('red')); };
+      s.referrerPolicy = 'no-referrer';
+      s.src = url + '&callback=' + nombre;
+      document.head.appendChild(s);
+    });
+  }
+
+  function cargar() {
+    if (cargando) return;
+    if (modo.demo) { datos = ejemplo(); $('ejemplo').hidden = false; pintar(); return; }
+    cargando = true;
+    $('actualizar').disabled = true;
+    pedir(modo.clave).then(function (r) {
+      if (r && r.ok && r.datos) { datos = r.datos; aviso(''); pintar(); }
+      else if (r && r.error === 'clave') { sinClave(); }
+      else { aviso('No pudimos actualizar los datos. Toca Actualizar en un momento.'); }
+    }, function () {
+      aviso('No pudimos conectarnos. Revisa tu internet y toca Actualizar.');
+    }).then(function () { cargando = false; $('actualizar').disabled = false; });
+  }
+
+  // Datos de ejemplo para la vista previa (#demo)
+  function ejemplo() {
+    var ahora = Date.now(), h = 3600000;
+    var asisten = [
+      ['Familia Aranda Rojas', 2, 3], ['Luz Marina Pérez', 2, 0], ['Jairo Mendoza', 1, 2], ['Rosa Elvira Cárdenas', 4, 1],
+      ['Carlos Andrés Gómez', 2, 2], ['Doña Teresa', 1, 0], ['Los primos de Moniquirá', 5, 4], ['Andrés Felipe', 1, 0]
+    ].map(function (f, i) { return { nombre: f[0], adultos: f[1], ninos: f[2], fecha: new Date(ahora - i * 7 * h).toISOString() }; });
+    var t = { confirmaciones: 10, asisten: asisten.length, noAsisten: 2, adultos: 0, ninos: 0, personas: 0 };
+    asisten.forEach(function (a) { t.adultos += a.adultos; t.ninos += a.ninos; });
+    t.personas = t.adultos + t.ninos;
+    return {
+      totales: t, asisten: asisten, noAsisten: ['Hernando Vargas', 'Martha Lucía Díaz'],
+      ranking: [
+        { puesto: 1, nombre: 'Luz Marina Pérez', nombreGallo: 'La Candela', ganadas: 7, puntos: 1150 },
+        { puesto: 2, nombre: 'Jairo Mendoza', nombreGallo: 'Relámpago', ganadas: 6, puntos: 1020 },
+        { puesto: 3, nombre: 'Rosa Elvira Cárdenas', nombreGallo: 'La Pinta', ganadas: 6, puntos: 980 },
+        { puesto: 4, nombre: 'Carlos Andrés Gómez', nombreGallo: 'Azabache', ganadas: 3, puntos: 620 },
+        { puesto: 5, nombre: 'Andrés Felipe', nombreGallo: 'Copito', ganadas: 1, puntos: 210 }
+      ],
+      actualizado: new Date(ahora).toISOString(),
+      diasFaltan: Math.max(0, Math.round((Date.UTC(2026, 11, 30) - Date.now()) / 86400000)),
+      fechaTexto: 'Miércoles 30 de diciembre de 2026'
+    };
+  }
+
+  $('buscar').addEventListener('input', function () { if (datos) pintarLista(); });
+  $('actualizar').addEventListener('click', cargar);
+
+  if (!modo.demo && (!modo.clave || !/^https:\/\//.test(URL_EXEC))) {
+    sinClave();
+  } else {
+    $('tablero').hidden = false;
+    cargar();
+    if (!modo.demo) setInterval(function () { if (!document.hidden) cargar(); }, 60000);
+  }
+})();
+</script>
+</body>
+</html>
